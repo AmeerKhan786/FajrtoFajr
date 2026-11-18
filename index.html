@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2b1b19"><meta name="description" content="A Fajr-to-Fajr companion for worship, discipline, health, habit accountability and consistency analytics.">
+<link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="stylesheet" href="./style.css">
+<title>Fajr to Fajr — Spiritual Discipline & Consistency</title>
+</head>
+<body>
+<div class="app-shell">
+<header class="topbar">
+  <a class="brand" href="#home" aria-label="Fajr to Fajr home"><span class="brand-mark">☾</span><span>FAJR <i>TO</i> FAJR</span></a>
+  <button class="icon-btn" id="settingsBtn" aria-label="Settings">⚙</button>
+</header>
+<main id="app" aria-live="polite">
+  <section class="calendar-strip panel" id="calendarPanel">
+    <div class="calendar-date"><p class="eyebrow">TODAY · GREGORIAN & HIJRI</p><h2 id="gregorianDate">Loading date…</h2><p id="hijriDate" class="hijri-date">Hijri date…</p></div>
+    <div class="calendar-meta"><span class="date-pill" id="hijriMonthBadge">Islamic calendar</span><p id="hijriEvent" class="hint">Checking Islamic occasions…</p></div>
+  </section>
+  <nav class="tabbar" id="mainTabs" role="tablist" aria-label="Main sections">
+    <button type="button" class="tab-btn active" role="tab" aria-selected="today" data-tab="today">Today</button><button type="button" class="tab-btn" role="tab" aria-selected="worship" data-tab="worship">Worship</button><button type="button" class="tab-btn" role="tab" aria-selected="fasting" data-tab="fasting">Fasting</button><button type="button" class="tab-btn" role="tab" aria-selected="quran" data-tab="quran">Quran</button><button type="button" class="tab-btn" role="tab" aria-selected="insights" data-tab="insights">Insights</button><button type="button" class="tab-btn" role="tab" aria-selected="calendar" data-tab="calendar">Calendar</button><button type="button" class="tab-btn" role="tab" aria-selected="health" data-tab="health">Health</button><button type="button" class="tab-btn" role="tab" aria-selected="badhabits" data-tab="badhabits">Quit habits 🔒</button>
+  </nav>
+  <section class="panel fasting-panel" id="fastingPanel">
+    <div class="section-head"><div><p class="eyebrow">FASTING & RAMADAN</p><h2 id="fastingTitle">Fasting tracker</h2></div><span class="date-pill" id="fastingModeBadge">Daily</span></div>
+    <div class="fasting-times"><div><small>SUHOOR ENDS · FAJR</small><strong id="suhoorTime">—</strong></div><div><small>IFTAR · MAGHRIB</small><strong id="iftarTime">—</strong></div></div>
+    <p class="hint" id="fastingTimesNote">Prayer times load when your city is configured. Follow your local mosque timetable.</p>
+    <p class="hint fasting-caution" id="fastingCaution" hidden role="status"></p>
+    <div class="field"><label for="fastingType">Fasting intention / type</label><select id="fastingType"><option value="none">Not fasting</option><option value="ramadan">Ramadan fast</option><option value="monday">Monday fast</option><option value="thursday">Thursday fast</option><option value="white-days">Ayyam al-Bid (13th–15th)</option><option value="ashura">Ashura fast</option><option value="arafah">Day of Arafah</option><option value="makeup">Make-up (Qada) fast</option><option value="voluntary">Other voluntary fast</option></select></div>
+    <label class="task-row fasting-check"><span class="task-icon">☾</span><span class="task-name">I observed a fast today</span><input id="fastingDone" type="checkbox"></label>
+    <div id="ramadanControls" hidden>
+      <div class="ramadan-grid"><label><input id="suhoorDone" type="checkbox"> Suhoor completed</label><label><input id="iftarDone" type="checkbox"> Iftar recorded</label><label><input id="taraweehDone" type="checkbox"> Taraweeh</label><label><input id="qiyamDone" type="checkbox"> Qiyam / night prayer</label></div>
+      <div class="field"><label for="ramadanQuran">Quran pages today (Ramadan goal is personal)</label><input id="ramadanQuran" type="number" min="0" max="604" inputmode="numeric" placeholder="Pages read"></div>
+      <p class="hint" id="ramadanMessage">Ramadan mode is active. Adjust your routine and fasting record for this day.</p>
+    </div>
+    <div class="field"><label for="fastingNote">Fasting notes (optional)</label><input id="fastingNote" maxlength="240" placeholder="Energy, intention or reflection"></div>
+    <button class="secondary full" id="saveFasting">Save fasting record</button>
+  </section>
+  <section class="panel" id="islamicEventsPanel">
+    <div class="section-head"><div><p class="eyebrow">ISLAMIC CALENDAR</p><h2>Special days & reminders</h2></div><span class="date-pill">Hijri year</span></div>
+    <div id="islamicEventsList" class="event-list"></div>
+    <p class="hint">Dates are calculated estimates and may differ by local moon sighting. Special-prayer and fasting notes are reminders, not rulings; follow your trusted scholar and local announcements.</p>
+  </section>
+  <section class="hero">
+    <p class="eyebrow">A DAILY COMMITMENT · 100 DAYS</p>
+    <h1>Show up.<br><em>Fajr to Fajr.</em></h1>
+    <p class="sub">Discipline in action. Commitment in practice. Consistency, one day at a time.</p>
+    <div class="hero-actions"><button class="primary" id="startBtn">Start my 100 days</button><button class="quiet" id="resumeBtn" hidden>Continue challenge</button></div>
+  </section>
+  <section class="stats-grid" id="stats">
+    <article class="stat"><span>Current day</span><strong id="dayStat">—</strong><small>of 100</small></article>
+    <article class="stat"><span>Completed days</span><strong id="doneStat">0</strong><small>fully completed</small></article>
+    <article class="stat"><span>Current run</span><strong id="streakStat">0</strong><small>consecutive days</small></article>
+  </section>
+  <section class="panel" id="spiritualDashboard">
+    <div class="section-head"><div><p class="eyebrow">YOUR JOURNEY AT A GLANCE</p><h2>Spiritual progress</h2></div><span class="date-pill" id="milestoneBadge">First steps</span></div>
+    <div class="insight-grid"><div><small>Prayer check-ins</small><strong id="prayerConsistency">0%</strong></div><div><small>Quran pages</small><strong id="quranTotal">0</strong></div><div><small>Dhikr recorded</small><strong id="dhikrTotal">0</strong></div><div><small>Muraqaba minutes</small><strong id="muraqabaTotal">0</strong></div><div><small>Fasting days</small><strong id="fastingTotal">0</strong></div><div><small>Completed days</small><strong id="completedTotal">0 / 100</strong></div><div><small>Avg. sleep</small><strong id="sleepAverage">—</strong></div><div><small>Screen time</small><strong id="screenTimeTotal">0h</strong></div><div><small>Unnecessary use</small><strong id="phoneTimeTotal">0m</strong></div></div>
+    <div class="habit-analytics" id="habitAnalytics">
+      <div class="section-head" style="margin-top:22px"><div><p class="eyebrow">CONSISTENCY MATRIX</p><h2>Your daily habit map</h2></div><select id="matrixRange" aria-label="Habit matrix date range"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option></select></div>
+      <p class="hint">A mark means you recorded the practice. A dash means no record—not a judgement. Partial progress is shown separately from completion.</p>
+      <div class="matrix-legend"><span><i class="matrix-dot done"></i> Target met</span><span><i class="matrix-dot partial"></i> In progress</span><span><i class="matrix-dot"></i> No record</span></div>
+      <div class="matrix-scroll"><div id="habitMatrix" class="habit-matrix" aria-label="Daily habit consistency matrix"></div></div>
+      <div class="section-head" style="margin-top:20px"><div><p class="eyebrow">MONTH AT A GLANCE</p><h2>Consistency calendar</h2></div><strong id="monthConsistency" class="matrix-rate">—</strong></div>
+      <div id="consistencyCalendar" class="consistency-calendar"></div>
+      <div class="section-head" style="margin-top:20px"><div><p class="eyebrow">TREND</p><h2>Weekly consistency</h2></div></div>
+      <div id="weeklyConsistency" class="weekly-consistency"></div>
+      <p class="hint" id="matrixInsight">As you record more days, your consistency pattern will appear here.</p>
+    </div>
+
+    <div class="deep-analytics" id="deepAnalytics">
+      <div class="section-head" style="margin-top:24px"><div><p class="eyebrow">DEEPER ACCOUNTABILITY</p><h2>What is improving?</h2></div><button class="secondary" id="annualReportBtn" type="button">Journey report ↗</button></div>
+      <div class="insight-grid">
+        <div><small>Prayer punctuality</small><strong id="prayerOnTimeRate">—</strong></div>
+        <div><small>Delayed check-ins</small><strong id="prayerDelayedCount">0</strong></div>
+        <div><small>Sunnah check-ins</small><strong id="sunnahTotal">0</strong></div>
+        <div><small>Nafl check-ins</small><strong id="naflTotal">0</strong></div>
+        <div><small>Quran memorisation days</small><strong id="quranMemorisedDays">0</strong></div>
+        <div><small>Quran revision days</small><strong id="quranRevisionDays">0</strong></div>
+      </div>
+      <div class="health-correlation" id="healthCorrelation" aria-live="polite"><p class="hint">As sleep and digital-use records accumulate, this section can compare recorded patterns. It will not infer cause and effect.</p></div>
+      <div class="report-output" id="annualReportOutput" aria-live="polite"></div>
+    </div>
+    <div class="milestone-row" id="challengeMilestones"></div>
+    <div class="section-head" style="margin-top:18px"><div><p class="eyebrow">CERTIFICATES</p><h2>Milestone achievements</h2></div><span class="date-pill">21 · 45 · 75 · 100</span></div>
+    <div id="milestoneCertificates" class="milestone-certificates"></div>
+    <div class="insight-grid"><div><small>Current streak</small><strong id="currentStreakInsight">0 days</strong></div><div><small>Longest streak</small><strong id="bestStreakInsight">0 days</strong></div><div><small>Completed milestones</small><strong id="milestoneCountInsight">0 / 4</strong></div></div>
+    <p class="hint">These are personal habit records, not a measure of faith or spiritual worth.</p>
+  </section>
+  <section class="panel" id="todayPanel">
+    <div class="section-head"><div><p class="eyebrow">TODAY'S CHECKLIST</p><h2 id="todayTitle">Your daily practices</h2></div><span class="date-pill" id="dayLabel">Not started</span></div>
+    <div class="progress-line"><span id="progressBar"></span></div>
+    <p class="progress-copy" id="progressCopy">Start your challenge to begin tracking.</p>
+    <div class="task-list" id="taskList">
+      <div class="task-row"><span class="task-icon">01</span><span class="task-name">Pray Fajr</span></div>
+      <div class="task-row"><span class="task-icon">02</span><span class="task-name">Pray Dhuhr</span></div>
+      <div class="task-row"><span class="task-icon">03</span><span class="task-name">Pray Asr</span></div>
+      <div class="task-row"><span class="task-icon">04</span><span class="task-name">Pray Maghrib</span></div>
+      <div class="task-row"><span class="task-icon">05</span><span class="task-name">Pray Isha</span></div>
+      <div class="task-row"><span class="task-icon">06</span><span class="task-name">Read 7 pages of Quran</span></div>
+      <div class="task-row"><span class="task-icon">07</span><span class="task-name">100 Salawat</span></div>
+      <div class="task-row"><span class="task-icon">08</span><span class="task-name">100 Istighfar</span></div>
+      <div class="task-row"><span class="task-icon">09</span><span class="task-name">100 Dhikr</span></div>
+      <div class="task-row"><span class="task-icon">10</span><span class="task-name">Muraqaba / quiet reflection</span></div>
+    </div>
+    <div class="task-controls" id="taskControls" hidden>
+      <div class="counter-row"><div><b>Quran reading</b><small>Track pages read today</small></div><div class="stepper"><button data-counter="quran" data-delta="-1" aria-label="Decrease Quran pages">−</button><strong id="quranCount">0 / 7</strong><button data-counter="quran" data-delta="1" aria-label="Increase Quran pages">+</button></div></div>
+      <div class="counter-row"><div><b>Salawat</b><small>Track 100 repetitions</small></div><div class="stepper"><button data-counter="salawat" data-delta="-1" aria-label="Decrease salawat">−</button><strong id="salawatCount">0 / 100</strong><button data-counter="salawat" data-delta="1" aria-label="Increase salawat">+</button></div></div>
+      <div class="counter-row"><div><b>Istighfar</b><small>Track 100 repetitions</small></div><div class="stepper"><button data-counter="istighfar" data-delta="-1" aria-label="Decrease istighfar">−</button><strong id="istighfarCount">0 / 100</strong><button data-counter="istighfar" data-delta="1" aria-label="Increase istighfar">+</button></div></div>
+      <div class="counter-row"><div><b>Dhikr</b><small>Track 100 repetitions</small></div><div class="stepper"><button data-counter="dhikr" data-delta="-1" aria-label="Decrease dhikr">−</button><strong id="dhikrCount">0 / 100</strong><button data-counter="dhikr" data-delta="1" aria-label="Increase dhikr">+</button></div></div>
+      <div class="counter-row"><div><b>Muraqaba</b><small>Quiet mindful remembrance · target 10 minutes</small></div><div class="stepper"><button data-counter="muraqaba" data-delta="-1" aria-label="Decrease muraqaba minutes">−</button><strong id="muraqabaCount">0 / 10 min</strong><button data-counter="muraqaba" data-delta="1" aria-label="Increase muraqaba minutes">+</button></div></div>
+      <button class="secondary full" id="completeQuran">Mark 7 pages complete</button>
+      <button class="secondary full" id="completeSalawat">Mark 100 Salawat complete</button>
+      <button class="secondary full" id="completeIstighfar">Mark 100 Istighfar complete</button>
+      <button class="secondary full" id="completeDhikr">Mark 100 Dhikr complete</button>
+      <button class="secondary full" id="completeMuraqaba">Mark 10 minutes complete</button>
+      <div class="field"><label for="dailyHours">Time invested today (hours, optional)</label><input id="dailyHours" type="number" min="0" max="24" step="0.25" inputmode="decimal" placeholder="e.g. 0.5"></div>
+      <div class="field"><label for="intention">Today's intention (niyyah)</label><input id="intention" maxlength="240" placeholder="What do I want to be mindful of today?"></div>
+      <div class="field"><label for="reflection">Evening reflection / muhasabah</label><textarea id="reflection" rows="3" maxlength="1000" placeholder="What went well? What can I improve tomorrow?"></textarea></div>
+      <div class="field"><label for="gratitude">One thing I'm grateful for</label><input id="gratitude" maxlength="240" placeholder="A small blessing from today"></div>
+      <button class="secondary full" id="saveJournal">Save today's reflection</button>
+    </div>
+  </section>
+
+  <section class="panel commitment-panel" id="commitmentPanel">
+    <div class="section-head"><div><p class="eyebrow">PLAN · EXECUTE · REVIEW</p><h2>Today's commitments</h2></div><span class="date-pill">Three promises</span></div>
+    <p class="hint">Choose three realistic commitments. Keep them specific and achievable. These are personal accountability goals, not a measure of faith.</p>
+    <div class="field"><label for="commitWorship">1 · Worship commitment</label><input id="commitWorship" maxlength="180" placeholder="e.g. Pray each salah within its time"></div>
+    <div class="field"><label for="commitDiscipline">2 · Discipline commitment</label><input id="commitDiscipline" maxlength="180" placeholder="e.g. No unnecessary scrolling before sleep"></div>
+    <div class="field"><label for="commitPersonal">3 · Personal commitment</label><input id="commitPersonal" maxlength="180" placeholder="e.g. Finish the most important work task"></div>
+    <div class="commit-review">
+      <b>End-of-day review</b>
+      <p class="hint">Be honest, not harsh. A setback is information you can use to improve tomorrow.</p>
+      <label class="task-row"><span class="task-name">I honoured the commitments I set today</span><input id="commitHonoured" type="checkbox"></label>
+      <div class="field"><label for="commitReview">What helped or got in the way?</label><textarea id="commitReview" rows="2" maxlength="600" placeholder="What worked? What interrupted me?"></textarea></div>
+      <div class="field"><label for="commitNextStep">One adjustment for tomorrow</label><input id="commitNextStep" maxlength="180" placeholder="Make the next step small and clear"></div>
+    </div>
+    <button class="primary full" id="saveCommitments">Save today's commitments</button>
+    <p class="hint" id="commitmentSaved" aria-live="polite"></p>
+  </section>
+\n  <section class="panel" id="disciplinePanel">
+    <div class="section-head"><div><p class="eyebrow">OPTIONAL DISCIPLINE ANCHORS</p><h2>Protect your routine</h2></div><span class="date-pill">Support habits</span></div>
+    <p class="hint">These habits support consistency but do not affect your 10 core practices or strict-mode completion.</p>
+    <div class="task-list">
+      <label class="task-row"><span class="task-icon">A</span><span class="task-name">No phone for first 30 minutes</span><input type="checkbox" data-habit="phoneFree"></label>
+      <label class="task-row"><span class="task-icon">B</span><span class="task-name">20 minutes of movement</span><input type="checkbox" data-habit="movement"></label>
+      <label class="task-row"><span class="task-icon">C</span><span class="task-name">Follow my sleep routine</span><input type="checkbox" data-habit="sleepRoutine"></label>
+      <label class="task-row"><span class="task-icon">D</span><span class="task-name">One act of kindness / service</span><input type="checkbox" data-habit="kindness"></label>
+    </div>
+  </section>
+  <section class="panel health-panel" id="healthPanel">
+    <div class="section-head"><div><p class="eyebrow">HEALTH · DAILY FOLLOW-THROUGH</p><h2>Look after your body and mind</h2></div><span class="date-pill" id="healthDateLabel">Today</span></div>
+    <p class="hint">Enter only your prescribed or personally approved medicines and supplements. This is a manual log, not a diagnosis or an automatic medical reminder.</p>
+    <div class="health-subsection">
+      <h3>Medicines & supplements</h3>
+      <div class="field"><label for="medName">Name</label><input id="medName" maxlength="100" placeholder="Medicine or supplement name"></div>
+      <div class="two-fields"><div class="field"><label for="medDose">Dose / instructions</label><input id="medDose" maxlength="100" placeholder="As prescribed / label"></div><div class="field"><label for="medTime">Usual time</label><input id="medTime" type="time"></div></div>
+      <button class="secondary full" id="addMedicine">Add to daily plan</button>
+      <div id="medicineList" class="stack-list"></div>
+      <div class="report-grid">
+        <div class="report-card"><small>Medication statuses recorded this week</small><strong id="medWeekTotal">0</strong></div>
+        <div class="report-card"><small>Missed / skipped this week</small><strong id="medWeekMissed">0</strong></div>
+      </div>
+    </div>
+    <div class="health-subsection">
+      <h3>Movement, weight & focus</h3>
+      <p class="hint">Choose activity appropriate to your abilities. Start gently and follow medical advice where relevant.</p>
+      <div class="exercise-grid">
+        <label class="task-row"><span class="task-name">Walking</span><input id="exerciseWalk" type="checkbox"></label>
+        <label class="task-row"><span class="task-name">Strength work</span><input id="exerciseStrength" type="checkbox"></label>
+        <label class="task-row"><span class="task-name">Mobility / stretching</span><input id="exerciseMobility" type="checkbox"></label>
+        <label class="task-row"><span class="task-name">Focused breathing / focus practice</span><input id="exerciseFocus" type="checkbox"></label>
+      </div>
+      <div class="two-fields"><div class="field"><label for="exerciseMinutes">Movement minutes</label><input id="exerciseMinutes" type="number" min="0" max="300" inputmode="numeric" placeholder="0"></div><div class="field"><label for="focusMinutes">Focused minutes</label><input id="focusMinutes" type="number" min="0" max="300" inputmode="numeric" placeholder="0"></div></div>
+      <div class="field"><label for="weightEntry">Weight (kg, optional)</label><input id="weightEntry" type="number" min="25" max="350" step="0.1" inputmode="decimal" placeholder="Optional check-in"></div>
+      <div class="field"><label for="exerciseNote">Notes (optional)</label><textarea id="exerciseNote" rows="2" maxlength="300" placeholder="Energy, activity or how you felt"></textarea></div>
+      <button class="primary full" id="saveHealthDay">Save today's health record</button>
+      <div class="metric-grid">
+        <div class="metric"><small>Movement minutes this week</small><b id="moveWeekTotal">0</b></div>
+        <div class="metric"><small>Focus minutes this week</small><b id="focusWeekTotal">0</b></div>
+        <div class="metric"><small>Active movement days this month</small><b id="exerciseMonthDays">0</b></div>
+      </div>
+      <div class="health-stats" id="healthSummary"></div>
+    </div>
+
+    <div class="health-subsection sleep-subsection" id="healthSleepSection">
+      <h3>Sleep tracking</h3>
+      <p class="hint">Record when you got into bed and when you got out of bed. Your history helps you spot patterns and improve consistency. Duration is calculated across midnight.</p>
+      <div class="two-fields">
+        <div class="field"><label for="bedtime">Time I got into bed</label><input id="bedtime" type="time"></div>
+        <div class="field"><label for="wakeup">Time I got out of bed</label><input id="wakeup" type="time"></div>
+      </div>
+      <button class="secondary full" id="saveSleep" type="button">Save sleep record</button>
+      <p class="hint" id="sleepSummary" aria-live="polite">No sleep record saved for today.</p>
+      <div class="metric-grid sleep-metrics">
+        <div class="metric"><small>Today's sleep</small><b id="sleepDurationToday">—</b></div>
+        <div class="metric"><small>Average this week</small><b id="sleepAverageHealth">—</b></div>
+        <div class="metric"><small>Nights recorded this month</small><b id="sleepNightsTracked">0</b></div>
+      </div>
+      <h3 class="sleep-history-heading">Sleep history</h3>
+      <div id="sleepHistory" class="stack-list"></div>
+    </div>
+  </section>
+  <section class="panel" id="prayerTimesPanel">
+    <div class="section-head"><div><p class="eyebrow">TODAY'S PRAYER TIMES</p><h2>Prayer schedule</h2></div><button class="secondary" id="refreshPrayerTimes">Refresh</button></div>
+    <p class="hint" id="prayerTimesStatus">Set your city in Settings to load prayer times.</p>
+    <div class="prayer-times-grid" id="prayerTimesGrid"><span>Fajr —</span><span>Dhuhr —</span><span>Asr —</span><span>Maghrib —</span><span>Isha —</span></div>
+    <p class="hint">Times are provided by AlAdhan and are informational. Confirm your local mosque's timetable and calculation method.</p>
+  </section>
+  <section class="panel">
+    <div class="section-head"><div><p class="eyebrow">MINDFUL PAUSE</p><h2>Muraqaba timer</h2></div><span class="date-pill" id="timerTargetBadge">10 minutes</span></div>
+    <div class="field"><label for="timerMinutes">Session length (minutes)</label><input id="timerMinutes" type="number" min="1" max="180" value="10" inputmode="numeric"></div>
+    <div class="timer-display" id="muraqabaTimer">10:00</div>
+    <div class="hero-actions"><button class="primary" id="timerStart">Start</button><button class="secondary" id="timerPause">Pause</button><button class="quiet" id="timerReset">Reset</button></div>
+    <p class="hint" id="timerStatus">Settle comfortably and begin when ready. The timer does not prescribe a religious method.</p>
+  </section>
+  <section class="panel">
+    <div class="section-head"><div><p class="eyebrow">REFLECTION & ACCOUNTABILITY</p><h2>Weekly and monthly reports</h2></div></div>
+    <div class="hero-actions"><button class="secondary" id="weeklyReportBtn">Weekly report</button><button class="secondary" id="monthlyReportBtn">Monthly report</button><button class="quiet" id="certificateBtn">100-day certificate</button></div>
+    <div class="report-output" id="reportOutput" aria-live="polite"></div>
+  </section>
+  <section class="panel" id="quranStudyPanel">
+    <div class="section-head"><div><p class="eyebrow">QURAN LEARNING</p><h2>Reading & memorisation</h2></div><span class="date-pill">Personal study</span></div>
+    <div class="field"><label for="studySurah">Surah / passage</label><input id="studySurah" maxlength="100" placeholder="e.g. Al-Mulk"></div>
+    <div class="field two-fields"><div><label for="studyAyahFrom">From ayah</label><input id="studyAyahFrom" type="number" min="1" max="286"></div><div><label for="studyAyahTo">To ayah</label><input id="studyAyahTo" type="number" min="1" max="286"></div></div>
+    <div class="ramadan-grid"><label><input id="studyMemorised" type="checkbox"> Memorised</label><label><input id="studyRevised" type="checkbox"> Revised</label></div>
+    <div class="field"><label for="learningNote">Daily Islamic learning / takeaway</label><textarea id="learningNote" rows="3" maxlength="1000" placeholder="A lesson, ayah reflection or beneficial reminder"></textarea></div>
+    <button class="secondary full" id="saveQuranStudy">Save Quran study & learning note</button>
+  </section>
+  <section class="panel" id="recoveryPanel">
+    <div class="section-head"><div><p class="eyebrow">RESET WITH INTENTION</p><h2>Habit recovery</h2></div><span class="date-pill">No shame · Next step</span></div>
+    <div class="field"><label for="recoveryReason">What interrupted my routine?</label><select id="recoveryReason"><option value="">Choose if useful</option><option>Sleep / fatigue</option><option>Work / family commitments</option><option>Distraction / phone use</option><option>Travel / illness / circumstances</option><option>Forgot / lost routine</option><option>Other</option></select></div>
+    <div class="field"><label for="recoveryPlan">One practical step to restart</label><textarea id="recoveryPlan" rows="2" maxlength="500" placeholder="A small realistic next step"></textarea></div>
+    <button class="secondary full" id="saveRecovery">Save recovery intention</button>
+  </section>
+  <section class="panel" id="sunnahPanel">
+    <div class="section-head"><div><p class="eyebrow">SUNNAH & NAFL</p><h2>Additional prayers</h2></div><span class="date-pill">Optional tracker</span></div>
+    <p class="hint">Record Sunnah and Nafl prayers alongside each obligatory prayer. Choose the practices and counts that match your learning and trusted scholarly guidance.</p>
+    <div id="sunnahPrayerList" class="accountability-list"></div>
+    <div class="counter-row"><div><b>Ishraq prayer</b><small>After sunrise, when its time has entered</small></div><label class="switch-label"><input id="ishraqDone" type="checkbox"> Completed</label></div>
+    <div class="counter-row"><div><b>Tahajjud / night prayer</b><small>Check-in opens from 4:00 AM local time until Fajr. You can log it retrospectively later.</small></div><label class="switch-label"><input id="tahajjudDone" type="checkbox"> Completed</label></div><p class="hint" id="tahajjudWindowNote">Tahajjud tracker window starts at 04:00 local time.</p>
+  </section>
+  <section class="panel" id="dailyWirdPanel">
+    <div class="section-head"><div><p class="eyebrow">DAILY WIRD</p><h2>Surah At-Taghabun & Darood</h2></div><span class="date-pill">Daily tracker</span></div>
+    <div class="counter-row"><div><b>Surah At-Taghabun</b><small>Personal target: 3–41 repetitions</small></div><div class="stepper"><button data-counter="taghabun" data-delta="-1" aria-label="Decrease Taghabun">−</button><strong id="taghabunCount">0 / 3–41</strong><button data-counter="taghabun" data-delta="1" aria-label="Increase Taghabun">+</button></div></div>
+    <div class="field"><label for="taghabunTarget">Daily target (3 to 41)</label><input id="taghabunTarget" type="number" min="3" max="41" value="3" inputmode="numeric"></div>
+    <div class="counter-row"><div><b>Darood-e-Nariyah</b><small>Daily personal count; no religious ruling implied</small></div><div class="stepper"><button data-counter="nariyah" data-delta="-1" aria-label="Decrease Darood Nariyah">−</button><strong id="nariyahCount">0</strong><button data-counter="nariyah" data-delta="1" aria-label="Increase Darood Nariyah">+</button></div></div>
+    <button class="secondary full" id="saveWird">Save daily wird targets</button>
+  </section>
+  <section class="panel" id="adhkarPanel">
+    <div class="section-head"><div><p class="eyebrow">MORNING & EVENING ADHKAR</p><h2>After Fajr & Maghrib</h2></div><span class="date-pill">Daily checklist</span></div>
+    <p class="hint">A tracker for your chosen morning and evening adhkar. Use your trusted adhkar collection for the exact wording and repetition counts.</p>
+    <div class="adhkar-group"><h3>After Fajr · Morning adhkar</h3><label class="task-row"><span class="task-name">Morning adhkar completed</span><input type="checkbox" id="morningAdhkar"></label><div class="field"><label for="morningAdhkarNote">Optional note / collection reference</label><input id="morningAdhkarNote" maxlength="160" placeholder="Collection or personal note"></div></div>
+    <div class="adhkar-group"><h3>After Maghrib · Evening adhkar</h3><label class="task-row"><span class="task-name">Evening adhkar completed</span><input type="checkbox" id="eveningAdhkar"></label><div class="field"><label for="eveningAdhkarNote">Optional note / collection reference</label><input id="eveningAdhkarNote" maxlength="160" placeholder="Collection or personal note"></div></div>
+    <button class="secondary full" id="saveAdhkar">Save adhkar check-ins</button>
+  </section>
+  <section class="panel" id="fridayPanel">
+    <div class="section-head"><div><p class="eyebrow">FRIDAY · JUMU'AH</p><h2>Friday special worship</h2></div><span class="date-pill" id="fridayDateLabel">Friday tracker</span></div>
+    <p class="hint">A separate Friday record for Salat al-Tasbih and additional Salawat. No fixed Salawat target is imposed here.</p>
+    <div class="counter-row"><div><b>Salat al-Tasbih</b><small>Record if completed</small></div><label class="switch-label"><input id="salatTasbihDone" type="checkbox"> Completed</label></div>
+    <div class="field"><label for="fridaySalawat">Additional Salawat on Friday (count)</label><input id="fridaySalawat" type="number" min="0" max="100000" step="1" inputmode="numeric" placeholder="Enter your total"></div>
+    <button class="secondary full" id="saveFriday">Save Friday worship</button>
+    <p class="hint" id="fridayStatus"></p>
+  </section>
+  <section class="panel" id="accountabilityPanel">
+    <div class="section-head"><div><p class="eyebrow">PRAYER ACCOUNTABILITY</p><h2>On time or delayed</h2></div></div>
+    <p class="hint">Record each prayer separately. Choose the status that honestly describes your completion.</p>
+    <div id="prayerAccountability" class="accountability-list"></div>
+  </section>
+  <section class="panel">
+    <div class="section-head"><div><p class="eyebrow">MURAQABA LOG</p><h2>Session history</h2></div></div>
+    <div class="field"><label for="muraqabaSessionMinutes">Session duration (minutes)</label><input id="muraqabaSessionMinutes" type="number" min="1" max="180" value="10"></div>
+    <button class="secondary full" id="logMuraqaba">Record completed session</button>
+    <div id="muraqabaHistory" class="report-output"></div>
+  </section>
+  <section class="panel">
+    <div class="section-head"><div><p class="eyebrow">DHIKR MILESTONES</p><h2>Build your consistency</h2></div></div>
+    <p class="hint">Track your total daily dhikr count and celebrate milestones at 100, 300, 500 and 1,000.</p>
+    <div id="dhikrMilestones" class="milestone-row"></div>
+  </section>
+  <section class="panel">
+    <div class="section-head"><div><p class="eyebrow">DIGITAL DISCIPLINE</p><h2>Distraction accountability</h2></div></div>
+    <div class="field"><label for="screenTime">Total screen time today (hours)</label><input id="screenTime" type="number" min="0" max="24" step="0.25" placeholder="e.g. 4.5"></div>
+    <div class="field"><label for="unnecessaryPhone">Unnecessary phone use (minutes)</label><input id="unnecessaryPhone" type="number" min="0" max="1440" step="5" placeholder="e.g. 35"></div>
+    <button class="secondary full" id="saveDistraction">Save digital discipline</button>
+  </section>
+  <section class="panel">
+    <div class="section-head"><div><p class="eyebrow">SADAQAH & KINDNESS</p><h2>Good deeds log</h2></div></div>
+    <div class="field"><label for="sadaqahDescription">What did you do? (optional private note)</label><input id="sadaqahDescription" maxlength="240" placeholder="Charity, helping someone, kind words…"></div>
+    <div class="field"><label for="sadaqahAmount">Amount (optional)</label><input id="sadaqahAmount" type="number" min="0" step="1" placeholder="Leave blank if not monetary"></div>
+    <button class="secondary full" id="logSadaqah">Record act of sadaqah / kindness</button>
+    <div id="sadaqahHistory" class="report-output"></div>
+  </section>
+
+  <section class="panel">
+    <div class="section-head"><div><p class="eyebrow">WEEKLY MUHASABA</p><h2>Review your week honestly</h2></div></div>
+    <div class="field"><label for="muhasabaActions">Actions I am grateful I completed</label><textarea id="muhasabaActions" rows="2" maxlength="1000"></textarea></div>
+    <div class="field"><label for="muhasabaShortcomings">Where did I fall short?</label><textarea id="muhasabaShortcomings" rows="2" maxlength="1000"></textarea></div>
+    <div class="field"><label for="muhasabaHabits">Which habits helped or harmed me?</label><textarea id="muhasabaHabits" rows="2" maxlength="1000"></textarea></div>
+    <div class="field"><label for="muhasabaIntentions">My intention for the coming week</label><textarea id="muhasabaIntentions" rows="2" maxlength="1000"></textarea></div>
+    <button class="secondary full" id="saveMuhasaba">Save weekly Muhasaba</button>
+    <div id="muhasabaHistory" class="report-output"></div>
+  </section>
+  <section class="panel">
+    <div class="section-head"><div><p class="eyebrow">THE JOURNEY</p><h2>100-day progress</h2></div><strong id="overallPct">0%</strong></div>
+    <div class="days-grid" id="daysGrid"></div>
+    <p class="hint">Each tile represents one challenge day. Completed days are marked; the current day is outlined.</p>
+  </section>
+  <section class="panel rule-panel">
+    <p class="eyebrow">THE CHALLENGE RULE</p><h2>One day at a time.</h2>
+    <p>Complete all five prayers, seven pages of Quran and 100 dhikr within your Fajr-to-Fajr day. In strict mode, an incomplete day resets the challenge to Day 1 when the next challenge day begins.</p>
+    <p class="muted">This tracker records your own check-ins. It cannot verify worship or determine religious validity. Follow your own trusted scholarly guidance for personal circumstances.</p>
+  </section>
+  <section class="panel private-panel" id="badHabitsPanel">
+    <div class="section-head"><div><p class="eyebrow">PRIVATE QUIT PLAN · ACCOUNTABILITY</p><h2>Quit habits with a daily plan</h2></div><span class="date-pill">PIN protected · encrypted</span></div>
+    <p class="hint">This is an accountability board, not a notes-only list. Set a baseline and a reason to quit, then record every day, including zero. Review urges, triggers, replacement actions and weekly/monthly progress. A lapse is recorded honestly without erasing previous abstinent days. Your entries are PIN-encrypted on this device.</p>
+    <div id="badHabitsLocked">
+      <p id="badHabitsLockMessage" class="setting-note">Set a PIN to create your private vault, or unlock your existing vault.</p>
+      <div class="field"><label for="badHabitsPin">PIN (8–12 digits)</label><input id="badHabitsPin" type="password" inputmode="numeric" autocomplete="current-password" minlength="8" maxlength="12" placeholder="Enter PIN"></div>
+      <div class="field" id="badHabitsPinConfirmWrap" hidden><label for="badHabitsPinConfirm">Confirm PIN</label><input id="badHabitsPinConfirm" type="password" inputmode="numeric" minlength="8" maxlength="12" placeholder="Confirm PIN"></div>
+      <button class="primary full" id="badHabitsUnlock">Set PIN / Unlock vault</button>
+    </div>
+    <div id="badHabitsUnlocked" hidden>
+      <div class="row-between"><strong>Vault unlocked</strong><button class="quiet" id="badHabitsLock">Lock now</button></div>
+      <div class="field"><label for="badHabitName">Habit I want to stop</label><input id="badHabitName" maxlength="100" placeholder="Use a neutral label if you prefer"></div>
+      <div class="two-fields"><div class="field"><label for="badHabitUnit">Measurement unit</label><input id="badHabitUnit" maxlength="40" placeholder="Cigarettes, times, minutes"></div><div class="field"><label for="badHabitBaseline">Current average per day (baseline)</label><input id="badHabitBaseline" type="number" min="0" max="100000" step="1" inputmode="numeric" placeholder="Optional baseline"></div></div>
+      <div class="field"><label for="badHabitWhy">Why I am choosing to quit</label><textarea id="badHabitWhy" rows="2" maxlength="300" placeholder="Your reason and what you want back in your life"></textarea></div>
+      <div class="field"><label for="badHabitTrigger">Common trigger</label><input id="badHabitTrigger" maxlength="180" placeholder="Time, place, emotion or situation"></div>
+      <div class="field"><label for="badHabitReplacement">Replacement action / prevention plan</label><textarea id="badHabitReplacement" rows="2" maxlength="500" placeholder="What will I do instead?"></textarea></div>
+      <button class="secondary full" id="addBadHabit">Add private habit</button>
+      <div id="badHabitsList" class="private-habit-list"></div>
+      <div class="habit-log-board">
+        <h3>Daily quit check-in</h3>
+        <p class="hint">Record every day, including zero. Missing days are not counted as abstinent. A lapse is data for your next prevention plan; it does not erase earlier progress.</p>
+        <div class="field"><label for="habitLogDate">Date to review</label><input id="habitLogDate" type="date"></div>
+        <div class="metric-grid">
+          <div class="metric"><small>Habit-days recorded · this week</small><b id="habitWeekTotal">0</b></div>
+          <div class="metric"><small>Zero-count habit-days · this week</small><b id="habitWeekZero">0</b></div>
+          <div class="metric"><small>Habit-days recorded · this month</small><b id="habitMonthTotal">0</b></div>
+          <div class="metric"><small>Zero-count habit-days · this month</small><b id="habitMonthZero">0</b></div>
+        </div>
+        <div id="badHabitDailyBoard" class="stack-list"></div>
+        <div id="habitMonthlyBreakdown" class="habit-monthly-breakdown"></div>
+        <p id="habitFeedback" class="hint" aria-live="polite">Record a count for each habit you are working to stop.</p>
+      </div>
+      <p class="hint">PIN recovery is not available. If you forget it, encrypted entries cannot be recovered. Export a backup periodically; the vault remains encrypted in the backup.</p>
+    </div>
+  </section>
+  <footer><span>FAJR TO FAJR</span><span>Private by default · Stored on this device</span></footer>
+</main>
+</div>
+<div class="modal-backdrop" id="modalBackdrop" hidden>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head"><div><p class="eyebrow">YOUR CHALLENGE</p><h2 id="modalTitle">Settings & backup</h2></div><button class="icon-btn" id="closeModal" aria-label="Close">×</button></div>
+    <div id="modalContent"></div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script src="./app.js" defer></script>
+</body></html>
