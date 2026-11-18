@@ -1,0 +1,50 @@
+name: Fajr to Fajr quality checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Verify required files
+        run: |
+          set -euo pipefail
+          for file in index.html app.js style.css sw.js manifest.webmanifest test-app.cjs README.md CHANGELOG.md QA_REPORT.md; do
+            test -s "$file" || { echo "Missing or empty: $file"; exit 1; }
+          done
+      - name: JavaScript syntax
+        run: |
+          node --check app.js
+          node --check sw.js
+          node --check test-app.cjs
+      - name: Application regression tests (India timezone)
+        run: TZ=Asia/Kolkata node test-app.cjs
+      - name: Validate web manifest
+        run: node -e "JSON.parse(require('fs').readFileSync('manifest.webmanifest','utf8')); console.log('Manifest JSON valid')"
+      - name: Validate HTML IDs and expected tab structure
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
+          if (ids.length !== new Set(ids).size) throw new Error('Duplicate HTML IDs found');
+          const tabs = [...html.matchAll(/data-tab="([^"]+)"/g)].map(m => m[1]);
+          const expected = ['today','worship','fasting','quran','insights','calendar','health','badhabits'];
+          for (const tab of expected) if (!tabs.includes(tab)) throw new Error('Missing tab: ' + tab);
+          if (tabs.length !== expected.length) throw new Error('Unexpected tab count: ' + tabs.length);
+          console.log('HTML structure valid: unique IDs and eight tabs');
+          NODE
