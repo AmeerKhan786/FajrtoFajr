@@ -1,34 +1,28 @@
-# Fajr to Fajr v15 — QA report
+# Fajr to Fajr v18 — stability fix QA report
 
-## Release changes
-- Prayer punctuality: calculates on-time share and delayed check-in count from recorded prayer statuses only.
-- Sunnah and Nafl: totals separate optional prayer check-ins; no target or religious judgement is applied.
-- Quran: counts days marked for memorisation and revision, separately from pages read.
-- Sleep / digital-use comparison: compares recorded sleep durations on dates with <=30 minutes vs >30 minutes of unnecessary phone use. It appears only with at least three paired records and explicitly warns that this is descriptive, not causal or medical.
-- Personal journey report: generates a printable report from all available records on/after the challenge start date, including prayer, Quran, optional prayers, fasting, dhikr, Muraqaba, commitments, reflections and sleep.
-- Existing weekly/monthly report, habit matrix, recovery prompt, commitment tracker, encrypted private vault, health tab and Islamic calendar are retained.
-- Service-worker cache bumped to `fajr-to-fajr-v15`.
+## Source baseline
+The application changes are based on the exact current GitHub `app.js` content retrieved during this review. Its Git blob SHA was `8256a1cd0e0ad24fce9144d5d73fe18b6b546006`, matching the previously prepared complete app source. This avoids replacing the repository with an older uploaded copy.
 
-## Automated checks executed
+## Fixes
+- Clear decrypted private-habit state and lock the vault before reset/import; refresh lock UI after state replacement.
+- Use `boundaryDate()` for the Hijri date associated with fasting and the Islamic calendar's daily record.
+- Pass the date key to `isDone()` in weekly/monthly reports.
+- Restrict offline app-shell fallback to navigation requests; return 503 for unavailable non-navigation resources.
+- Re-check day state on visibility return and every 30 seconds while open, so Fajr boundary rollovers are noticed without waiting for another user action.
+- Correct sleep validation message to match the existing `<24 hour` accepted duration.
+
+## Local automated checks
 - `node --check app.js` — PASS.
 - `node --check sw.js` — PASS.
-- `TZ=Asia/Kolkata node test-app.cjs` — PASS.
-- Existing suite covers navigation simulation, eight-tab visibility, unique DOM IDs, UI references, Hijri/Ramadan date handling, Fajr boundary, Tahajjud 04:00 assignment, health/sleep migration, encrypted private-habit vault, explicit-zero logs and abstinence calculations.
-- Added deterministic execution tests for prayer punctuality percentage, delayed count, Sunnah/Nafl totals, Quran memorisation/revision days, Quran page aggregation and commitment summary — PASS.
-- ZIP archive integrity and clean extraction checked after packaging.
+- `node --check test-stability-regressions.cjs` — PASS.
+- `TZ=Asia/Kolkata node test-stability-regressions.cjs` — PASS.
+- Tests cover report date argument, Fajr-aligned fasting/calendar, private vault reset/restore, visibility/boundary refresh, service-worker fallback, cache version, Fajr boundary calculation, and Friday completion behavior.
 
-## Manual verification still required
-1. On the deployed HTTPS app, open Insights and check that the deeper accountability section renders.
-2. Enter on-time and delayed prayer statuses across multiple dates; confirm the rate only uses recorded statuses.
-3. Enter Sunnah and Nafl check-ins; verify totals increase independently.
-4. Save Quran memorisation and revision on different dates; verify separate day counts.
-5. Enter sleep and unnecessary phone-use records on at least three dates; verify the descriptive comparison appears and does not claim causality.
-6. Generate and print the personal journey report.
-7. Export JSON backup, reinstall/update, restore backup and verify the same analytics.
-8. Test offline reload and installed PWA behavior on Android Chrome after one online visit.
+## Not yet verified
+- Existing repository `test-app.cjs` has not been run in this local package because it was not available as a local file during this pass.
+- The new regression test is not yet added to the GitHub Actions workflow.
+- No live Android device test, live deployed PWA test, offline browser test, or backup/restore test has been performed.
+- No GitHub commit or deployment was made: the connected GitHub integration rejected branch creation with HTTP 403 (Resource not accessible by integration).
 
-## Limits and interpretation
-- No real Android device or live GitHub Pages deployment was available for this test pass; those are not claimed as passed.
-- The sleep / phone-use view is a descriptive comparison of self-reported records, not evidence of cause and effect, and not medical advice.
-- The journey report summarizes only what was entered locally. Missing records are not interpreted as missed worship.
-- This app is a self-accountability tool, not a religious authority. Optional practice records are not measures of faith or spiritual worth.
+## Release caution
+Export a JSON backup before replacing the app files. Preserve the existing localStorage key and data schema.
