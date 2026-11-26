@@ -1,28 +1,17 @@
-Fajr to Fajr recording fix — source patch
+Fajr to Fajr — updated source files
 
-Contents:
-- apply_fajr_fix.py: safely applies the reviewed changes to app.js and sw.js.
-- README.txt: usage and verification notes.
+Files
+- app.js: complete updated application JavaScript.
+- sw.js: service worker with cache version v17 so browsers fetch the updated app.js.
 
-How to use:
-1. Download and unzip this package.
-2. Put apply_fajr_fix.py in the root of your local AmeerKhan786/FajrtoFajr checkout,
-   beside app.js and sw.js.
-3. Run: python apply_fajr_fix.py
-4. Review the changes, then commit and push app.js and sw.js to GitHub.
-5. Wait for GitHub Pages deployment and test the live app.
+Apply in GitHub
+1. Open the FajrtoFajr repository.
+2. Open app.js, choose Edit (pencil), select all, and replace it with the complete contents of this app.js file.
+3. Commit the change.
+4. Repeat for sw.js using the supplied sw.js file, then commit.
+5. Wait for GitHub Pages to finish deploying, then reload the app. If the old version remains, close the installed PWA and reopen it after the service worker updates.
 
-The script creates timestamped backups and refuses to modify files if the expected
-source snippets are missing or ambiguous.
-
-Changes:
-- Daily records no longer require the 100-day challenge to have been started.
-- The daily task controls and task list remain available before challenge start.
-- Prayer dropdowns save on the change event rather than the click event.
-- Service worker cache version changes from v15 to v16.
-
-Important:
-This is a source patch, not a deployed release. GitHub write access was denied
-when the update was attempted. Test on a copy first and export your app data
-before making changes. The patch does not clear localStorage or intentionally
-modify stored records.
+Important
+- Export a JSON backup from the app before updating if you have any records you cannot afford to lose. These code changes do not intentionally change the localStorage key or data schema.
+- Do not upload app.js.patch as app.js. This package contains the complete app.js file.
+- These files have been syntax-checked with Node.js, but a live browser/device end-to-end test has not been run.
