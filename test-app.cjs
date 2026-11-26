@@ -38,7 +38,7 @@ assert(js.includes('habitReductionPercent') && js.includes('urge>=7'), 'Baseline
 assert(js.includes('function isRamadanDate(h)') && js.includes('function fastingDateCaution(h)'), 'Ramadan and fasting exception logic missing');
 assert(js.includes('if(m!==9&&d>=13&&d<=15&&!(m===12&&d===13))'), 'Ayyam al-Bid must avoid Ramadan and 13 Dhul Hijjah collision');
 assert(js.includes("fastingCaution').hidden=!caution"), 'Fasting caution banner not wired');
-assert(sw.includes('fajr-to-fajr-v17'), 'Service worker cache not bumped to v15');
+assert(sw.includes('fajr-to-fajr-v18'), 'Service worker cache not bumped to v15');
 assert(css.includes('.private-panel') && css.includes('.habit-log-board') && css.includes('.health-panel'), 'Expected styles missing');
 assert(css.includes('.habit-matrix') && css.includes('.consistency-calendar') && css.includes('.weekly-consistency'), 'Habit analytics styles missing');
 assert(js.includes('function matrixHabitRows()') && js.includes('function renderHabitAnalytics()'), 'Habit matrix / analytics renderer missing');
